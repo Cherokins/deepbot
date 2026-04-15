@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🚀 SureBet Trading Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #fff;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        /* Header */
+        .header {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            background: linear-gradient(135deg, #00d2ff, #3a7bd5);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+        
+        .status-bar {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            margin-top: 15px;
+        }
+        
+        .status-badge {
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 14px;
+            background: rgba(16, 185, 129, 0.2);
+            border: 1px solid #10b981;
+            color: #10b981;
+        }
+        
+        .status-badge.warning {
+            background: rgba(245, 158, 11, 0.2);
+            border-color: #f59e0b;
+            color: #f59e0b;
+        }
+        
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .stat-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: transform 0.2s;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.15);
+        }
+        
+        .stat-label {
+            font-size: 14px;
+            color: #94a3b8;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .stat-value {
+            font-size: 32px;
+            font-weight: bold;
+            color: #fff;
+        }
+        
+        .positive { color: #10b981; }
+        .negative { color: #ef4444; }
+        
+        /* Section */
+        .section {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .section-title {
+            font-size: 1.5em;
+            margin-bottom: 20px;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        /* Table */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th {
+            text-align: left;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px 10px 0 0;
+            color: #94a3b8;
+            font-weight: 600;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        td {
+            padding: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        tr:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+        
+        /* Signal Cards */
+        .signals-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 15px;
+        }
+        
+        .signal-card {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            padding: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .signal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .signal-symbol {
+            font-size: 1.3em;
+            font-weight: bold;
+        }
+        
+        .signal-badge {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 12px;
+        }
+        
+        .STRONG_BUY { background: #059669; color: white; }
+        .BUY { background: #10b981; color: white; }
+        .WEAK_BUY { background: #34d399; color: black; }
+        .NEUTRAL { background: #6b7280; color: white; }
+        .WEAK_SELL { background: #f87171; color: black; }
+        .SELL { background: #ef4444; color: white; }
+        .STRONG_SELL { background: #dc2626; color: white; }
+        
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00d2ff, #3a7bd5);
+            border-radius: 10px;
+            transition: width 0.3s;
+        }
+        
+        .indicator-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+            margin-top: 15px;
+            font-size: 13px;
+        }
+        
+        .indicator-item {
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .indicator-label {
+            color: #94a3b8;
+        }
+        
+        /* Refresh */
+        .refresh-indicator {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 10px 20px;
+            border-radius: 30px;
+            font-size: 12px;
+            color: #94a3b8;
+            backdrop-filter: blur(10px);
+            cursor: pointer;
+        }
+        
+        .refresh-indicator:hover {
+            background: rgba(0, 0, 0, 0.7);
+        }
+        
+        /* Loading */
+        .loading {
+            text-align: center;
+            padding: 40px;
+        }
+        
+        .spinner {
+            border: 3px solid rgba(255, 255, 255, 0.1);
+            border-top: 3px solid #00d2ff;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+    
+    <!-- Firebase SDK -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getDatabase, ref, onValue, get } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+        
+        // YOUR FIREBASE CONFIG - REPLACE WITH YOUR ACTUAL CONFIG
+        const firebaseConfig = {
+            databaseURL: "https://surebet-ke-default-rtdb.firebaseio.com/",
+            projectId: "surebet-ke"
+        };
+        
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+        
+        // Global state
+        let botState = {};
+        let analyses = {};
+        let trades = [];
+        let positions = {};
+        
+        // Load all data from Firebase
+        async function loadData() {
+            try {
+                // Load bot state
+                const stateRef = ref(database, 'bot_state');
+                const stateSnapshot = await get(stateRef);
+                if (stateSnapshot.exists()) {
+                    botState = stateSnapshot.val();
+                    updateBotState();
+                }
+                
+                // Load analyses
+                const analysesRef = ref(database, 'analyses');
+                const analysesSnapshot = await get(analysesRef);
+                if (analysesSnapshot.exists()) {
+                    analyses = analysesSnapshot.val();
+                    updateAnalyses();
+                }
+                
+                // Load trades
+                const tradesRef = ref(database, 'trades');
+                const tradesSnapshot = await get(tradesRef);
+                if (tradesSnapshot.exists()) {
+                    const tradesData = tradesSnapshot.val();
+                    trades = Object.values(tradesData);
+                    updateTrades();
+                }
+                
+                // Load positions
+                const positionsRef = ref(database, 'positions');
+                const positionsSnapshot = await get(positionsRef);
+                if (positionsSnapshot.exists()) {
+                    positions = positionsSnapshot.val();
+                    updatePositions();
+                }
+                
+                updateLastUpdate();
+                
+            } catch (error) {
+                console.error('Error loading data:', error);
+                document.getElementById('connectionStatus').textContent = '● OFFLINE';
+                document.getElementById('connectionStatus').className = 'status-badge warning';
+            }
+        }
+        
+        function updateBotState() {
+            const lastRun = botState.last_run ? new Date(botState.last_run) : null;
+            const now = new Date();
+            const minutesSinceLastRun = lastRun ? Math.floor((now - lastRun) / 60000) : 999;
+            
+            const statusEl = document.getElementById('botStatus');
+            if (minutesSinceLastRun < 30) {
+                statusEl.textContent = '● ACTIVE';
+                statusEl.className = 'status-badge';
+            } else if (minutesSinceLastRun < 60) {
+                statusEl.textContent = '● DELAYED';
+                statusEl.className = 'status-badge warning';
+            } else {
+                statusEl.textContent = '● OFFLINE';
+                statusEl.className = 'status-badge warning';
+            }
+            
+            document.getElementById('pairsScanned').textContent = botState.pairs_scanned || 0;
+            document.getElementById('opportunitiesFound').textContent = botState.opportunities_found || 0;
+            document.getElementById('tradesExecuted').textContent = botState.trades_executed || 0;
+        }
+        
+        function updateAnalyses() {
+            const grid = document.getElementById('signalsGrid');
+            const analysesList = Object.values(analyses);
+            
+            // Sort by composite score
+            analysesList.sort((a, b) => Math.abs(b.composite_score) - Math.abs(a.composite_score));
+            
+            let html = '';
+            for (const analysis of analysesList.slice(0, 12)) {
+                const score = analysis.composite_score || 0;
+                const scorePercent = ((score + 1) / 2 * 100);
+                const recommendation = analysis.recommendation || 'NEUTRAL';
+                
+                html += `
+                    <div class="signal-card">
+                        <div class="signal-header">
+                            <span class="signal-symbol">${analysis.symbol}</span>
+                            <span class="signal-badge ${recommendation}">${recommendation}</span>
+                        </div>
+                        <div style="margin-bottom: 15px;">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                                <span>Score: ${score.toFixed(3)}</span>
+                                <span>$${analysis.price?.toFixed(2) || '0.00'}</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: ${scorePercent}%"></div>
+                            </div>
+                        </div>
+                        <div style="margin-bottom: 10px;">
+                            <span style="color: #94a3b8;">Regime:</span> 
+                            <span>${analysis.market_regime || 'UNKNOWN'}</span>
+                        </div>
+                        <div class="indicator-grid">
+                            <div class="indicator-item">
+                                <span class="indicator-label">Stop Loss:</span>
+                                <span>$${analysis.stop_loss?.toFixed(2) || '0.00'}</span>
+                            </div>
+                            <div class="indicator-item">
+                                <span class="indicator-label">Take Profit:</span>
+                                <span>$${analysis.take_profit?.toFixed(2) || '0.00'}</span>
+                            </div>
+                            <div class="indicator-item">
+                                <span class="indicator-label">Position Size:</span>
+                                <span>$${analysis.position_size?.toFixed(0) || '0'}</span>
+                            </div>
+                            <div class="indicator-item">
+                                <span class="indicator-label">Confidence:</span>
+                                <span>${((analysis.confidence || 0) * 100).toFixed(1)}%</span>
+                            </div>
+                        </div>
+                        ${analysis.signals ? `
+                        <div style="margin-top: 10px; font-size: 12px; color: #94a3b8;">
+                            ${analysis.signals.slice(0, 3).map(s => `• ${s.name}: ${s.reasoning}`).join('<br>')}
+                        </div>
+                        ` : ''}
+                    </div>
+                `;
+            }
+            
+            grid.innerHTML = html || '<div class="loading">No analyses yet</div>';
+        }
+        
+        function updateTrades() {
+            const tbody = document.getElementById('tradesBody');
+            
+            if (!trades || trades.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="7" style="text-align: center; color: #94a3b8;">
+                            No trades executed yet
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            let html = '';
+            const recentTrades = trades.slice(-10).reverse();
+            
+            for (const trade of recentTrades) {
+                const time = trade.timestamp ? new Date(trade.timestamp).toLocaleString() : 'N/A';
+                const side = trade.side || 'BUY';
+                const sideClass = side === 'BUY' ? 'positive' : 'negative';
+                
+                html += `
+                    <tr>
+                        <td><strong>${trade.symbol}</strong></td>
+                        <td>${time}</td>
+                        <td class="${sideClass}">${side}</td>
+                        <td>$${trade.price?.toFixed(2) || '0.00'}</td>
+                        <td>${trade.quantity?.toFixed(6) || '0'}</td>
+                        <td>$${trade.value_usdt?.toFixed(2) || '0.00'}</td>
+                        <td><code style="background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 4px;">${trade.order_id || 'N/A'}</code></td>
+                    </tr>
+                `;
+            }
+            
+            tbody.innerHTML = html;
+        }
+        
+        function updatePositions() {
+            const tbody = document.getElementById('positionsBody');
+            const positionsList = Object.entries(positions);
+            
+            if (positionsList.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="6" style="text-align: center; color: #94a3b8;">
+                            No active positions
+                        </td>
+                    </tr>
+                `;
+                document.getElementById('activePositions').textContent = '0';
+                return;
+            }
+            
+            let html = '';
+            let totalPnL = 0;
+            
+            for (const [symbol, pos] of positionsList) {
+                const entryPrice = pos.entry_price || 0;
+                const currentPrice = pos.current_price || entryPrice;
+                const quantity = pos.quantity || 0;
+                const pnl = ((currentPrice - entryPrice) / entryPrice * 100) || 0;
+                const pnlClass = pnl >= 0 ? 'positive' : 'negative';
+                
+                totalPnL += pnl * (quantity * entryPrice) / 10000;
+                
+                html += `
+                    <tr>
+                        <td><strong>${symbol}</strong></td>
+                        <td>$${entryPrice.toFixed(2)}</td>
+                        <td>$${currentPrice.toFixed(2)}</td>
+                        <td>${quantity.toFixed(6)}</td>
+                        <td class="${pnlClass}">${pnl >= 0 ? '+' : ''}${pnl.toFixed(2)}%</td>
+                        <td>
+                            <span style="color: #ef4444;">$${pos.stop_loss?.toFixed(2) || '0.00'}</span> / 
+                            <span style="color: #10b981;">$${pos.take_profit?.toFixed(2) || '0.00'}</span>
+                        </td>
+                    </tr>
+                `;
+            }
+            
+            tbody.innerHTML = html;
+            document.getElementById('activePositions').textContent = positionsList.length;
+            document.getElementById('totalPnL').textContent = `${totalPnL >= 0 ? '+' : ''}$${Math.abs(totalPnL).toFixed(2)}`;
+            document.getElementById('totalPnL').className = `stat-value ${totalPnL >= 0 ? 'positive' : 'negative'}`;
+        }
+        
+        function updateLastUpdate() {
+            const now = new Date();
+            document.getElementById('lastUpdate').textContent = `Last update: ${now.toLocaleTimeString()}`;
+        }
+        
+        // Auto-refresh every 30 seconds
+        setInterval(loadData, 30000);
+        
+        // Manual refresh
+        document.getElementById('refreshBtn').addEventListener('click', () => {
+            loadData();
+        });
+        
+        // Initial load
+        loadData();
+        
+        // Export functions for global access
+        window.loadData = loadData;
+    </script>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>🚀 SureBet Intelligent Trading Bot</h1>
+            <div class="status-bar">
+                <span class="status-badge" id="botStatus">● INITIALIZING</span>
+                <span class="status-badge" id="connectionStatus">● CONNECTED</span>
+                <span style="margin-left: auto; color: #94a3b8;" id="lastUpdate">Loading...</span>
+            </div>
+        </div>
+        
+        <!-- Stats -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-label">Total P&L</div>
+                <div class="stat-value" id="totalPnL">$0.00</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Active Positions</div>
+                <div class="stat-value" id="activePositions">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Pairs Scanned</div>
+                <div class="stat-value" id="pairsScanned">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Opportunities Found</div>
+                <div class="stat-value" id="opportunitiesFound">0</div>
+            </div>
+        </div>
+        
+        <!-- Active Positions -->
+        <div class="section">
+            <div class="section-title">💼 Active Positions</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Symbol</th>
+                        <th>Entry Price</th>
+                        <th>Current Price</th>
+                        <th>Quantity</th>
+                        <th>P&L</th>
+                        <th>SL / TP</th>
+                    </tr>
+                </thead>
+                <tbody id="positionsBody">
+                    <tr><td colspan="6" style="text-align: center;">Loading...</td></tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Current Signals -->
+        <div class="section">
+            <div class="section-title">📊 Live Trading Signals</div>
+            <div class="signals-grid" id="signalsGrid">
+                <div class="loading">
+                    <div class="spinner"></div>
+                    <div>Loading signals...</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Recent Trades -->
+        <div class="section">
+            <div class="section-title">📝 Recent Trades</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Symbol</th>
+                        <th>Time</th>
+                        <th>Side</th>
+                        <th>Price</th>
+                        <th>Quantity</th>
+                        <th>Value (USDT)</th>
+                        <th>Order ID</th>
+                    </tr>
+                </thead>
+                <tbody id="tradesBody">
+                    <tr><td colspan="7" style="text-align: center;">Loading...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <!-- Refresh Button -->
+    <div class="refresh-indicator" id="refreshBtn">
+        🔄 Click to Refresh | Auto-refresh: 30s
+    </div>
+</body>
+</html>
